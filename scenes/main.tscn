@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://c66hmfdxtx0uw"]
+
+[ext_resource type="Material" uid="uid://8uir27xtn4em" path="res://assets/ballon_red.tres" id="1_0wfyh"]
+[ext_resource type="ArrayMesh" uid="uid://mqorghafx0mi" path="res://assets/Balloon.obj" id="1_o5qli"]
+[ext_resource type="Script" uid="uid://cd84a3ke44pvr" path="res://scripts/Balloon.cs" id="1_sugp2"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_h55o8"]
+radius = 0.5004883
+height = 1.1990356
+
+[sub_resource type="Environment" id="Environment_o5qli"]
+background_mode = 1
+background_color = Color(0.18106502, 0.29621774, 0.37469423, 1)
+
+[node name="Main" type="Node3D" unique_id=192668986]
+
+[node name="Balloon" type="Area3D" parent="." unique_id=1293336222]
+script = ExtResource("1_sugp2")
+
+[node name="Model" type="MeshInstance3D" parent="Balloon" unique_id=1098565920]
+material_override = ExtResource("1_0wfyh")
+mesh = ExtResource("1_o5qli")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Balloon" unique_id=834892440]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0602172, 0)
+shape = SubResource("CapsuleShape3D_h55o8")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1969991555]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.380749, 2.2152417)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1550872491]
+transform = Transform3D(0.8653071, -0.22373882, 0.44853607, 0, 0.8948491, 0.44636875, -0.5012421, -0.38624606, 0.7743193, 4.0606866, 2.0644658, 5.075433)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1574334601]
+environment = SubResource("Environment_o5qli")
