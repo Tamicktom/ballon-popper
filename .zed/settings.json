@@ -1,0 +1,20 @@
+{
+  "languages": {
+    "CSharp": {
+      "language_servers": ["roslyn", "!omnisharp", "!csharp-ls"]
+    }
+  },
+  "lsp": {
+    "roslyn": {
+      "settings": {
+        "csharp|projects": {
+          "dotnet_enable_automatic_restore": true,
+          "dotnet_enable_file_based_programs": false
+        },
+        "csharp|quick_info": {
+          "dotnet_show_remarks_in_quick_info": true
+        }
+      }
+    }
+  }
+}

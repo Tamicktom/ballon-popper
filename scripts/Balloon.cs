@@ -5,7 +5,6 @@ namespace Ballonpopper.scripts;
 
 public partial class Balloon : Area3D
 {
-
   [Godot.ExportGroup("Pop Settings")]
   [Godot.Export(Godot.PropertyHint.Range, "1,10,1")] // 1 to 10, step 1
   public int ClicksToPop = 5;
@@ -19,13 +18,14 @@ public partial class Balloon : Area3D
   protected Godot.AudioStream _popSound;
   protected Godot.AudioStream _inflateSound;
 
+  [Godot.Signal]
+  public delegate void PoppedEventHandler(int points);
+
   // Called when the node enters the scene tree for the first time.
   public override void _Ready()
   {
-	Godot.GD.Print("Balloon ready");
-	// `/assets/ballon_pop_sound_effect.ogg`
-	this._popSound = GD.Load<Godot.AudioStream>("res://assets/ballon_pop_sound_effect.ogg");
-	this._inflateSound = GD.Load<Godot.AudioStream>("res://assets/balloon_inflating.ogg");
+	this._popSound = Godot.GD.Load<Godot.AudioStream>("res://assets/ballon_pop_sound_effect.ogg");
+	this._inflateSound = Godot.GD.Load<Godot.AudioStream>("res://assets/balloon_inflating.ogg");
   }
 
   // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -33,7 +33,7 @@ public partial class Balloon : Area3D
   {
   }
 
-  public override void _InputEvent(Camera3D camera, InputEvent @event, Vector3 eventPosition, Vector3 normal, int shapeIdx)
+  public override void _InputEvent(Godot.Camera3D camera, Godot.InputEvent @event, Godot.Vector3 eventPosition, Godot.Vector3 normal, int shapeIdx)
   {
 	var isMouseEvent = @event is Godot.InputEventMouseButton;
 	if (isMouseEvent)
@@ -42,10 +42,8 @@ public partial class Balloon : Area3D
 	  if (IsLeftClickDown(@event as Godot.InputEventMouseButton) && this._canBePopped)
 	  {
 		this.ClicksToPop--;
-		Godot.GD.Print("Left mouse button pressed, clicks to pop: " + this.ClicksToPop);
 		if (this.ClicksToPop <= 0)
 		{
-		  Godot.GD.Print("Balloon popped");
 		  this._canBePopped = false;
 		  this.PopBalloonAnimation();
 		}
@@ -57,7 +55,7 @@ public partial class Balloon : Area3D
 	}
   }
 
-  private bool IsLeftClickDown(Godot.InputEventMouseButton mouseButtonEvent)
+  private static bool IsLeftClickDown(Godot.InputEventMouseButton mouseButtonEvent)
   {
 	return mouseButtonEvent.ButtonIndex == Godot.MouseButton.Left && mouseButtonEvent.IsPressed();
   }
@@ -65,7 +63,7 @@ public partial class Balloon : Area3D
   private void IncreaseBalloonSize()
   {
 	var actualScale = this.Scale;
-	var finalScale = new Vector3(
+	var finalScale = new Godot.Vector3(
 	  this.SizeIncreaseFactor * actualScale.X,
 	  this.SizeIncreaseFactor * actualScale.Y,
 	  this.SizeIncreaseFactor * actualScale.Z
@@ -79,16 +77,17 @@ public partial class Balloon : Area3D
   private async void PopBalloonAnimation()
   {
 	var actualScale = this.Scale;
-	var finalScale = new Vector3(
+	var finalScale = new Godot.Vector3(
 	  this.SizeIncreaseFactor * actualScale.X,
 	  this.SizeIncreaseFactor * actualScale.Y,
 	  this.SizeIncreaseFactor * actualScale.Z
 	);
 	var duration = this.PopAnimationDuration;
 
-	await ToSignal(this.IncreaseBalloonSizeTween(finalScale, duration), Tween.SignalName.Finished);
-	PlayPopSound();
-	QueueFree();
+	await this.ToSignal(this.IncreaseBalloonSizeTween(finalScale, duration), Tween.SignalName.Finished);
+	this.EmitSignal(SignalName.Popped, this.PointsToGive);
+	this.PlayPopSound();
+	this.QueueFree();
   }
 
   private void PlayPopSound()
@@ -97,7 +96,7 @@ public partial class Balloon : Area3D
 	{
 	  Stream = this._popSound,
 	};
-	GetParent().AddChild(soundPlayer);
+	this.GetParent().AddChild(soundPlayer);
 	soundPlayer.Finished += soundPlayer.QueueFree;
 	soundPlayer.Play();
   }
@@ -108,7 +107,7 @@ public partial class Balloon : Area3D
 	{
 	  Stream = this._inflateSound,
 	};
-	GetParent().AddChild(soundPlayer);
+	this.GetParent().AddChild(soundPlayer);
 	soundPlayer.Finished += soundPlayer.QueueFree;
 	soundPlayer.Play();
   }
@@ -116,7 +115,8 @@ public partial class Balloon : Area3D
   private Tween IncreaseBalloonSizeTween(Vector3 finalScale, float duration)
   {
 	var property = Node3D.PropertyName.Scale.ToString();
-	var tween = CreateTween();
+
+	var tween = this.CreateTween();
 	tween.TweenProperty(this, property, finalScale, duration)
 	  .SetTrans(Tween.TransitionType.Sine)
 	  .SetEase(Tween.EaseType.Out);

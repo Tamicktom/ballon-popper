@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://b175yc1wdr885"]
+
+[ext_resource type="Script" uid="uid://cd84a3ke44pvr" path="res://scripts/Balloon.cs" id="1_bjw4k"]
+[ext_resource type="Material" uid="uid://8uir27xtn4em" path="res://assets/ballon_red.tres" id="2_u045a"]
+[ext_resource type="ArrayMesh" uid="uid://mqorghafx0mi" path="res://assets/Balloon.obj" id="3_m0o5a"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_h55o8"]
+radius = 0.5004883
+height = 1.1990356
+
+[node name="Balloon" type="Area3D" unique_id=548554197]
+script = ExtResource("1_bjw4k")
+
+[node name="Model" type="MeshInstance3D" parent="." unique_id=245672469]
+material_override = ExtResource("2_u045a")
+mesh = ExtResource("3_m0o5a")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=545948152]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0602172, 0)
+shape = SubResource("CapsuleShape3D_h55o8")
