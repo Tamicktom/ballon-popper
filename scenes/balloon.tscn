@@ -10,6 +10,7 @@ height = 1.1990356
 
 [node name="Balloon" type="Area3D" unique_id=548554197]
 script = ExtResource("1_bjw4k")
+ClicksToPop = 3
 
 [node name="Model" type="MeshInstance3D" parent="." unique_id=245672469]
 material_override = ExtResource("2_u045a")
